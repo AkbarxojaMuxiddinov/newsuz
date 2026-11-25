@@ -1,0 +1,57 @@
+{% extends 'news/portal/base.html' %}
+{% load static %}
+
+{% block title %}{% if mode == 'register' %}Ro‘yxatdan o‘tish{% else %}Kirish{% endif %} — News.uz{% endblock %}
+
+{% block content %}
+  <div class="auth-layout">
+    <aside class="auth-aside">
+      <img class="auth-cover" src="{% static 'news/newsroom-cover.webp' %}" alt="">
+      <div class="auth-copy">
+        <a href="{% url 'portal:home' %}" class="wordmark">News<span>.</span>uz</a>
+
+      </div>
+    </aside>
+    <div class="auth-form form-panel">
+      {% if mode == 'register' %}
+        <h1>Ro‘yxatdan o‘tish</h1>
+        <p>Hisob oching va yangiliklarga izoh qoldiring.</p>
+      {% else %}
+        <h1>Hisobga kirish</h1>
+        <p>Username yoki emailingiz orqali kiring.</p>
+      {% endif %}
+      <form method="post" data-account-form="{{ mode }}" data-login-url="{% url 'portal:login' %}">
+        <label class="field">
+          <span>{% if mode == 'register' %}Username{% else %}Username yoki email{% endif %}</span>
+          <input name="username" autocomplete="username" required maxlength="254">
+        </label>
+        {% if mode == 'register' %}
+          <label class="field">
+            <span>Email</span>
+            <input name="email" type="email" autocomplete="email" required maxlength="254">
+          </label>
+        {% endif %}
+        <label class="field">
+          <span>Parol</span>
+          <input name="password" type="password" autocomplete="{% if mode == 'register' %}new-password{% else %}current-password{% endif %}" required>
+        </label>
+        {% if mode == 'register' %}
+          <label class="field">
+            <span>Parolni tasdiqlang</span>
+            <input name="password_confirm" type="password" autocomplete="new-password" required>
+          </label>
+        {% endif %}
+        <button class="button button-primary" type="submit">{% if mode == 'register' %}Hisob yaratish{% else %}Kirish{% endif %} <span aria-hidden="true">↗</span></button>
+        <p class="form-error" data-form-status role="status"></p>
+      </form>
+      <div class="auth-switch">
+        {% if mode == 'register' %}
+          Hisobingiz bormi? <a href="{% url 'portal:login' %}{% if next_path %}?next={{ next_path|urlencode }}{% endif %}">Kirish</a>
+        {% else %}
+          Hisobingiz yo‘qmi? <a href="{% url 'portal:register' %}{% if next_path %}?next={{ next_path|urlencode }}{% endif %}">Ro‘yxatdan o‘tish</a>
+        {% endif %}
+      </div>
+      <noscript><p>Hisob amallari uchun brauzerda JavaScript yoqilgan bo‘lishi kerak.</p></noscript>
+    </div>
+  </div>
+{% endblock %}

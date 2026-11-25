@@ -1,0 +1,99 @@
+{% extends 'news/portal/base.html' %}
+
+{% block title %}{{ article.title }} — News.uz{% endblock %}
+
+{% block content %}
+  <nav class="breadcrumb" aria-label="Sahifa yo‘li">
+    <a href="{% url 'portal:home' %}">Bosh sahifa</a>
+    <span aria-hidden="true">/</span>
+    <a href="{% url 'portal:home' %}?category={{ article.category.slug|urlencode }}">{{ article.category.name }}</a>
+  </nav>
+  <div class="detail-layout">
+    <article class="article-body">
+      <header class="detail-header">
+        <span class="category-label">{{ article.category.name }}</span>
+        <h1>{{ article.title }}</h1>
+        <p class="lede">{{ article.short_description }}</p>
+        <div class="story-meta">
+          <span>{{ article.author.get_full_name|default:article.author.username }}</span>
+          <span aria-hidden="true">·</span>
+          <time>{{ article.published_at|default:article.created_at|date:"d.m.Y · H:i" }}</time>
+          <span aria-hidden="true">·</span>
+          <span>{{ article.view_count }} ko‘rish</span>
+        </div>
+      </header>
+      {% if article.image %}
+        <img class="detail-photo" src="{{ article.image.url }}" alt="" fetchpriority="high">
+      {% endif %}
+      <div class="article-copy">{{ article.body|linebreaks }}</div>
+      {% with images=article.images.all %}
+        {% if images %}
+          <div class="gallery-grid" aria-label="Qo‘shimcha rasmlar">
+            {% for photo in images %}
+              <a href="{{ photo.image.url }}" aria-label="Rasmni ochish"><img src="{{ photo.image.url }}" alt="" loading="lazy"></a>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% with tags=article.tags.all %}
+        {% if tags %}
+          <div class="tag-list" aria-label="Teglar">
+            {% for tag in tags %}<span>#{{ tag.name }}</span>{% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <section class="comments" id="izohlar">
+        <div class="section-top">
+          <h2>Izohlar</h2><span>{{ comment_page.paginator.count }} ta</span>
+        </div>
+        <div class="form-panel" data-comment-login>
+          <p>Izoh qoldirish uchun hisobingizga kiring.</p>
+          <a class="button button-primary" href="{% url 'portal:login' %}?next={{ request.path|urlencode }}%23izohlar">Kirish</a>
+        </div>
+        <form class="form-panel" data-comment-form data-endpoint="{{ comment_endpoint }}" hidden>
+          <label class="field">
+            <span>Izohingiz</span>
+            <textarea name="text" required rows="4" placeholder="Fikringizni yozing…"></textarea>
+          </label>
+          <div class="form-actions"><button class="button button-primary" type="submit">Izohni yuborish</button></div>
+          <p class="form-error" data-form-status role="status"></p>
+        </form>
+        {% for comment in comment_page %}
+          <article class="comment-item">
+            <div class="comment-head">
+              <strong>{{ comment.user.get_full_name|default:comment.user.username }}</strong>
+              <time class="story-meta">{{ comment.created_at|date:"d.m.Y · H:i" }}</time>
+            </div>
+            <p>{{ comment.text|linebreaksbr }}</p>
+          </article>
+        {% empty %}
+          <p class="muted">Hozircha tasdiqlangan izohlar yo‘q.</p>
+        {% endfor %}
+        {% if comment_page.has_other_pages %}
+          <nav class="pagination" aria-label="Izoh sahifalari">
+            {% if comment_page.has_previous %}<a class="button button-light" href="?comments={{ comment_page.previous_page_number }}#izohlar">← Oldingi</a>{% endif %}
+            <span>{{ comment_page.number }} / {{ comment_page.paginator.num_pages }}</span>
+            {% if comment_page.has_next %}<a class="button button-light" href="?comments={{ comment_page.next_page_number }}#izohlar">Keyingi →</a>{% endif %}
+          </nav>
+        {% endif %}
+      </section>
+    </article>
+    {% if related %}
+      <aside class="latest-rail">
+        <div class="rail-heading">
+          <h2>Mavzuga oid</h2><span aria-hidden="true">↗</span>
+        </div>
+        {% for item in related %}
+          <a class="latest-item" href="{% url 'portal:article' item.slug %}">
+            <span class="latest-index" aria-hidden="true">{{ forloop.counter|stringformat:"02d" }}</span>
+            <span class="latest-copy">
+              <span class="story-meta">{{ item.published_at|default:item.created_at|date:"d.m.Y" }}</span>
+              <strong>{{ item.title }}</strong>
+            </span>
+          </a>
+        {% endfor %}
+      </aside>
+    {% endif %}
+  </div>
+{% endblock %}

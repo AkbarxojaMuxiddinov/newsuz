@@ -1,0 +1,16 @@
+<article class="story-card{% if item.image %} has-photo{% endif %}" data-reveal>
+  {% if item.image %}
+    <a class="card-picture" href="{% url 'portal:article' item.slug %}" tabindex="-1" aria-hidden="true">
+      <img src="{{ item.image.url }}" alt="" loading="lazy">
+    </a>
+  {% endif %}
+  <div class="card-content">
+    <div class="meta-line">
+      <span class="category-label">{{ item.category.name }}</span>
+      <time datetime="{{ item.published_at|default:item.created_at|date:'c' }}">{{ item.published_at|default:item.created_at|date:"d.m.Y · H:i" }}</time>
+    </div>
+    <h3><a href="{% url 'portal:article' item.slug %}">{{ item.title }}</a></h3>
+    {% if item.short_description %}<p>{{ item.short_description|truncatechars:145 }}</p>{% endif %}
+  </div>
+  <a class="card-arrow" href="{% url 'portal:article' item.slug %}" tabindex="-1" aria-hidden="true">↗</a>
+</article>
