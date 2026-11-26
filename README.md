@@ -49,4 +49,4 @@ Sayt sahifalarini Django HTML qilib beradi. Login va izoh yuborish uchun fronten
 
 ---
 
-PROWEB Python backend kursi uchun tayyorlangan o‘quv loyihasi.
+
